@@ -1,4 +1,6 @@
 import pandas as pd
+from utils import *
+import xgboost as xgb
 
 from typing import Tuple, Union, List
 
@@ -26,7 +28,26 @@ class DelayModel:
             or
             pd.DataFrame: features.
         """
-        return
+
+        data = data.dropna()
+
+        threshold_in_minutes = 15
+        data['period_day'] = data['Fecha-I'].apply(get_period_day)
+        data['high_season'] = data['Fecha-I'].apply(is_high_season)
+        data['min_diff'] = data.apply(get_min_diff, axis = 1)
+        data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
+
+        features = pd.concat([
+            pd.get_dummies(data['OPERA'], prefix = 'OPERA'),
+            pd.get_dummies(data['TIPOVUELO'], prefix = 'TIPOVUELO'), 
+            pd.get_dummies(data['MES'], prefix = 'MES')], 
+            axis = 1
+        )
+        if(target_column):
+            target = data[target_column]
+            return (features,target)
+        else:
+            return features
 
     def fit(
         self,
@@ -40,6 +61,11 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
+        n_y0 = len(target[target == 0])
+        n_y1 = len(target[target == 1])
+        scale = n_y0/n_y1
+        self._model = xgb.XGBClassifier(random_state=1, learning_rate=0.01, scale_pos_weight = scale, max_depth=5, min_child_weight=1)
+        self._model.fit(features, target)
         return
 
     def predict(
@@ -55,4 +81,5 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
-        return
+        preds = self._model.predict(features)
+        return preds
