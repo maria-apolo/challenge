@@ -1,21 +1,27 @@
 import pandas as pd
 from utils import *
 import xgboost as xgb
+from sklearn.preprocessing import OneHotEncoder
 
 from typing import Tuple, Union, List
 
 class DelayModel:
 
     def __init__(
-        self
+        self,
+        datafile = '../data/raw/data.csv'
     ):
-        self._model = None # Model should be saved in this attribute.
+        self._model = None                  # Model should be saved in this attribute.
+        self._ohe = None                    # ohe contains Onehot encoder for preds
+        self._data = pd.read_csv(datafile)
+        self._features, self._target = self.preprocess(data=self._data, target_column='delay')
+        self.fit(self._features, self._target) 
 
     def preprocess(
         self,
         data: pd.DataFrame,
         target_column: str = None
-    ) -> Union(Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame):
+    ) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
         """
         Prepare raw data for training or predict.
 
@@ -29,24 +35,20 @@ class DelayModel:
             pd.DataFrame: features.
         """
 
-        data = data.dropna()
-
-        threshold_in_minutes = 15
-        data['period_day'] = data['Fecha-I'].apply(get_period_day)
-        data['high_season'] = data['Fecha-I'].apply(is_high_season)
-        data['min_diff'] = data.apply(get_min_diff, axis = 1)
-        data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
-
-        features = pd.concat([
-            pd.get_dummies(data['OPERA'], prefix = 'OPERA'),
-            pd.get_dummies(data['TIPOVUELO'], prefix = 'TIPOVUELO'), 
-            pd.get_dummies(data['MES'], prefix = 'MES')], 
-            axis = 1
-        )
+ 
         if(target_column):
+
+            data = add_derivated_features(data)
+            self._ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
+            nominal_encode = self._ohe.fit_transform(data[['OPERA','TIPOVUELO', 'MES']])
+            #Converting back to a dataframe
+            features = pd.DataFrame(nominal_encode, columns=self._ohe.get_feature_names())
             target = data[target_column]
             return (features,target)
         else:
+            nominal_encode = self._ohe.transform(data[['OPERA','TIPOVUELO', 'MES']])
+            features = pd.DataFrame(nominal_encode, columns=self._ohe.get_feature_names())
+
             return features
 
     def fit(

@@ -1,13 +1,31 @@
-import fastapi
+from fastapi import FastAPI
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException 
+import pandas as pd 
 
-app = fastapi.FastAPI()
+from Flight import Flight
+from model import DelayModel
 
-@app.get("/health", status_code=200)
-async def get_health() -> dict:
-    return {
-        "status": "OK"
+app = FastAPI()
+delay_classifier = DelayModel()
+
+
+@app.get('/healthcheck', status_code=200)
+async def healthcheck():
+    return 'Predict Delay is running!'
+
+@app.post('/predict')
+def predict_delay(features: Flight):
+    data = [features.OPERA, features.TIPOVUELO, features.MES]
+    columns = ['OPERA', 'TIPOVUELO', 'MES']
+    df = pd.DataFrame(columns=columns)
+    df.loc[0] = data
+    try:
+        preprocessed_features = delay_classifier.preprocess(df)
+    except:
+        return HTTPException(status_code=400)
+    pred = delay_classifier.predict(preprocessed_features)
+    response_object = {
+        "predict": pred.tolist()
     }
-
-@app.post("/predict", status_code=200)
-async def post_predict() -> dict:
-    return
+    return JSONResponse(response_object)

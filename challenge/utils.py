@@ -30,7 +30,7 @@ def get_period_day(date):
         return 'noche'
     
 
-def is_high_season(date):
+def is_high_season(fecha):
     """
     Determine if is high season
 
@@ -99,4 +99,24 @@ def get_rate_from_column(data, column):
         else:
             rates[name] = 0
     return pd.DataFrame.from_dict(data = rates, orient = 'index', columns = ['Tasa (%)'])
+
+def add_derivated_features(data):
+
+    """
+    Computes new features
+
+    Args:
+        data (pd.dataFrame): flights dataframe.
+
+    Returns:
+        pd.dataFrame: Updated dataframe
+    """
+
+    threshold_in_minutes = 15
+    data['period_day'] = data['Fecha-I'].apply(get_period_day)
+    data['high_season'] = data['Fecha-I'].apply(is_high_season)
+    data['min_diff'] = data.apply(get_min_diff, axis = 1)
+    data['delay'] = np.where(data['min_diff'] > threshold_in_minutes, 1, 0)
+
+    return data
 
