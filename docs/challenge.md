@@ -2,33 +2,6 @@
 
 # LATAM challenge - María José Apolo
 
-## Instructions
-
-### Part I.
-
-In order to operationalize the model, transcribe the `.ipynb` file into the `model.py` file:
-
-- If you find something wrong (i.e. bug), fix it and/or change it, argue why.
-- Choose the best model at your discretion, argue why.
-- Apply all the good programming practices that you consider necessary in this item.
-- The model should pass the tests by running `make model-test`.
-
-Note:
-- **You cannot** remove or change the name or arguments of provided methods.
-- **You can** change/complete the implementation of the provided methods.
-- **You can** create the extra classes and methods you seem necessary.
-
-### Part II.
-
-Deploy the model in an `API` with `FastAPI` (use the `api.py` file).
-
-- The `API` should pass the tests by running `make api-test`.
-- You should modify the tests in `tests/integration/test_api.py` to match the previous question.
-
-Note: 
-- **You can** use other framework but you should:
-  - Argue why.
-  - Implement your own tests (the `API` **MUST** be tested).
 
 ### Part III.
 
@@ -46,78 +19,125 @@ Put your url in the `Makefile` (`line 26`). Then we will test the perfomance wit
 ### Part I
 #### Fixes
 
-Before operationalized the model, It was necessary to implement fixes in the following files:
-
-* utils.py - 
-* model.py - 
-
-### Partner
-* [Name of Partner organization/Government department etc..]
-* Website for partner
-* Partner contact: [Name of Contact], [slack handle of contact if any]
-* If you do not have a partner leave this section out
-
-### Methods Used
-* Inferential Statistics
-* Machine Learning
-* Data Visualization
-* Predictive Modeling
-* etc.
-
-### Technologies
-* R 
-* Python
-* D3
-* PostGres, MySql
-* Pandas, jupyter
-* HTML
-* JavaScript
-* etc. 
-
-## Project Description
-(Provide more detailed overview of the project.  Talk a bit about your data sources and what questions and hypothesis you are exploring. What specific data analysis/visualization and modelling work are you using to solve the problem? What blockers and challenges are you facing?  Feel free to number or bullet point things here)
-
-## Needs of this project
-
-- frontend developers
-- data exploration/descriptive statistics
-- data processing/cleaning
-- statistical modeling
-- writeup/reporting
-- etc. (be as specific as possible)
-
-## Getting Started
-
-1. Clone this repo (for help see this [tutorial](https://help.github.com/articles/cloning-a-repository/)).
-2. Raw Data is being kept [here](Repo folder containing raw data) within this repo.
-
-    *If using offline data mention that and how they may obtain the data from the froup)*
-    
-3. Data processing/transformation scripts are being kept [here](Repo folder containing data processing scripts/notebooks)
-4. etc...
-
-*If your project is well underway and setup is fairly complicated (ie. requires installation of many packages) create another "setup.md" file and link to it here*  
-
-5. Follow setup [instructions](Link to file)
-
-## Featured Notebooks/Analysis/Deliverables
-* [Notebook/Markdown/Slide Deck Title](link)
-* [Notebook/Markdown/Slide DeckTitle](link)
-* [Blog Post](link)
+Before operationalized the model, It was necessary to execute some fixes. The following table shows a summary of the main fixes. 
 
 
-## Data
+| File |Fixes |
+| --- | --- | 
+| `utils.py` | * get_period_day had extra intervals - * get_rate_from_column antipattern iterrows fix - * Delay rate formula correction rate = delay<class> / total<class> | 
+| `model.py` | * Union parenthesis correction |
+| `Makefile` | * Test was repeated and therefore, overwritten. - * Stress_test path folder correction| 
+| `test_model.py` | * Test_model_fit was computing .fit function over the whole dataset, then computing predict over already seen data| 
+| `requirements.txt` | * XGBoost added | 
 
-**Team Leads (Contacts) : [Full Name](https://github.com/[github handle])(@slackHandle)**
+#### Variables
 
-#### Other Members:
+The following table shows the candidate training attributes, its preprocessing options and extra details.
 
-|     |  Slack Handle   | 
-|---------|-----------------|
-|[Full Name](https://github.com/[github handle])| @johnDoe        |
-|[Full Name](https://github.com/[github handle]) |     @janeDoe    |
+| Attribute | Type | Preprocessing | Extra |
+| --- | --- | --- | |
+| `DIA/MES` | Categorical Ordinal / Cyclic variables | Onehot encoding / SinCos representation| MES was finally choosen due to notable influence based on plots information|
+| `DIANOM` | Categorical Ordinal / Cyclic variable | Categorical Ordinal / Cyclic variable | This variable didn't show impact in performance |
+| `AÑO` | Numerical variable | Normalization | This variable didn't show significative impact in performance |
+| `TIPO_VUELO` | Categorical Nominal | Onehot Encoding| Selected attribute based on notable importance show in plots|
+| `OPERA` | Categorical Nominal | Onehot Encoding| Selected attribute based on notable importance show in plots information|
+| `SIGLADES` | Categorical Nominal HIGH DIMENSIONALITY | Select top k values based on distribution, replace the remaining ones with 'Other' | Including this variable showed notable decreased in performance even after preprocessing|
+| `SIGLAORI`| Categorical Nominal | One hot encoding | All flights took off from 'Santiago' |
+| `high_season`| Categorical Binary | Numeric | This variable didn't show significative impact in performance |
+| `period_day`| Categorical Ordinal / Cyclic variable | Categorical Ordinal / Cyclic variable | This variable didn't show impact in performance |
 
-## Contact
-* If you haven't joined the SF Brigade Slack, [you can do that here](http://c4sf.me/slack).  
-* Our slack channel is `#datasci-projectname`
-* Feel free to contact team leads with any questions or if you are interested in contributing!
+
+#### Hyperparameters tuning
+
+*XGBoost: 
+  - max_depth: maximum depth of a tree. values = [3,4,5,6,7]
+  - min child weight: minimum sum of weights of all observations required in the child [1,2,3]
+
+  Best parameters: max_depth: 5, min_child_weight: 1, recall: 0.72
+
+*Logistic Regression 
+  - solver. values = ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+  - penalty: regularization. ['none', 'l1', 'l2', 'elasticnet']
+  - C [100,10,1,0.1,0.01]
+
+  Best parameters: Hyperparameter tuning didn't show further improvement.
+
+#### Model Comparison
+
+*XGBoost: ML Opensource library which contains and optimal implementation of Gradient Boosting Algorithm Based on Trees. 
+*Logistic Regression: Curvy linearly approach that analized the dependencies between a set of variables. 
+
+Option: XGBoost
+
+Reasoning: 
+ 
+* Logistic Regression is an ideal model to tackle problems in which there is a linear relationship between variables. On the other hand, XGBoost can represent decision rules of greater complexity that would be more suitable considering the observed behavior of the training attributes.
+
+* Additionally, given the high dimensionality of the classes present in the input variables, we are faced with a high-dimensional dataset where it is necessary to employ strategies such as prioritizing the most important variables. Given this complexity, it is my belief that XGBoost has greater potential to tackle this problem, given its robustness in handling the overfitting that can occur in high-dimensional datasets with a limited number of rows.
+
+*Furthermore, it is of utmost importance to consider that this is a clear case of class imbalance with a 4:1 ratio, for which it has been shown that tree-based models are more robust to this type of problem.
+
+* Despite the results obtained for both models in their default versions, XGBoost is notably superior to Logistic Regression in terms of the potential it can achieve through hyperparameters tuning. This is demonstrated both in the number of adjustable parameters that XGBoost has compared to the limited number of Logistic Regression, as well as in the competitive benchmark results obtained with this model. This gives XGBoost greater potential for future improvements in this implementation.
+
+* On the other hand, the computational efficiency of XGBoost makes it a relevant candidate when it comes to deploying a cloud service, where latency and stress tests are important parameters to evaluate.
+
+
+* Finally, XGBoost also offers explicability in order to understand the rules which commandate its decision making and make it more easily understandable. 
+
+#### Good programming practices
+
+There is significant place for improvement in my approach. One practical example, add a configuration file for paths or dictionaries. Feedback in this topic would be appreciated!
+
+#### Test Model
+In order to execute test-model, the following commands have to be executed:
+
+```make venv
+source .venv/bin/activate
+make install
+make test-model
+```
+
+The result shows 4/4 test completion [with warning!].
+
+## Part II
+
+#### Run server
+
+To run the test, you need to compile and execute the Dockerfile to deploy the API locally, and then perform the tests towards the API. The commands to execute the Dockerfile are as follows:
+
+```docker build -t gcr.io/prueba-latam-challenge/myapp .
+docker run -dp 1243:1243 -e PORT=1243 gcr.io/prueba-latam-challenge/myapp
+```
+
+### Execute test
+Once the API is running on localhost:1243, it's time to start the testing:
+
+```source .venv/bin/activate
+make api-test
+```
+
+Test results showed 4/4 completion [with warnings].
+
+Considerations: 
+
+* json format was modified in order to enhance a more simple and easy structure.
+* The error code 400 has been replaced with the error code 422 because this error provides more information. Additionally, considering the validation performed with typing, it is capable of identifying the erroneous parameter and providing valid values.
+###
+
+
+## Part II
+
+#### Deployment
+
+Finally, the service was deployed on Google Cloud. It is actually running on: 
+
+```
+https://mjapp-mwpwxnmowa-uc.a.run.app/
+```
+
+In order to execute the stress-test, the following command have to be executed:
+
+```
+source .venv/bin/activate
+make stress-test
+```
