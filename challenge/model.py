@@ -1,7 +1,8 @@
 import pandas as pd
-from utils import *
+from challenge.utils import *
 import xgboost as xgb
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.model_selection import train_test_split
 
 from typing import Tuple, Union, List
 
@@ -9,13 +10,11 @@ class DelayModel:
 
     def __init__(
         self,
-        datafile = '../data/raw/data.csv'
+        datafile =  './data/raw/data.csv'
     ):
-        self._model = None                  # Model should be saved in this attribute.
-        self._ohe = None                    # ohe contains Onehot encoder for preds
-        self._data = pd.read_csv(datafile)
-        self._features, self._target = self.preprocess(data=self._data, target_column='delay')
-        self.fit(self._features, self._target) 
+        self._SAVE_PATH = './challenge/pretrained/' 
+        self._model = None                  # Model should be saved in this attribute.                  
+        self.data = pd.read_csv(datafile)
 
     def preprocess(
         self,
@@ -35,19 +34,42 @@ class DelayModel:
             pd.DataFrame: features.
         """
 
- 
+        top_10_features = [
+            "OPERA_Latin American Wings", 
+            "MES_7",
+            "MES_10",
+            "OPERA_Grupo LATAM",
+            "MES_12",
+            "TIPOVUELO_I",
+            "MES_4",
+            "MES_11",
+            "OPERA_Sky Airline",
+            "OPERA_Copa Air"
+        ]
+
+        data = add_derivated_features(data)
+        encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+        nominal_encode = encoder.fit_transform(data[['OPERA','TIPOVUELO', 'MES']])
         if(target_column):
 
-            data = add_derivated_features(data)
-            self._ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
-            nominal_encode = self._ohe.fit_transform(data[['OPERA','TIPOVUELO', 'MES']])
+
             #Converting back to a dataframe
-            features = pd.DataFrame(nominal_encode, columns=self._ohe.get_feature_names())
-            target = data[target_column]
+            features_nominal = pd.DataFrame(nominal_encode, columns=encoder.get_feature_names_out())
+            target = data[target_column].to_frame(name='delay')
+            features = features_nominal[top_10_features]
+
+
             return (features,target)
         else:
-            nominal_encode = self._ohe.transform(data[['OPERA','TIPOVUELO', 'MES']])
-            features = pd.DataFrame(nominal_encode, columns=self._ohe.get_feature_names())
+
+
+            nominal_encode = encoder.transform(data[['OPERA','TIPOVUELO', 'MES']])
+            features_nominal = pd.DataFrame(nominal_encode, columns=encoder.get_feature_names_out())
+            features =pd.concat([features_nominal, 
+                                pd.DataFrame(columns=top_10_features)
+            ], axis=0)
+            features = features[top_10_features].fillna(0)
+
 
             return features
 
@@ -63,11 +85,14 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        n_y0 = len(target[target == 0])
-        n_y1 = len(target[target == 1])
+
+        n_y0 = len(target[target['delay'] == 0])
+        n_y1 = len(target[target['delay'] == 1])
         scale = n_y0/n_y1
+
         self._model = xgb.XGBClassifier(random_state=1, learning_rate=0.01, scale_pos_weight = scale, max_depth=5, min_child_weight=1)
-        self._model.fit(features, target)
+        self._model.fit(features, target['delay'])
+        self._model.save_model(self._SAVE_PATH+"xgb_imp_weighted.json")
         return
 
     def predict(
@@ -83,5 +108,8 @@ class DelayModel:
         Returns:
             (List[int]): predicted targets.
         """
+
+        self._model = xgb.XGBClassifier()
+        self._model.load_model(self._SAVE_PATH+"xgb_imp_weighted.json")
         preds = self._model.predict(features)
-        return preds
+        return preds.tolist()

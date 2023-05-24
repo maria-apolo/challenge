@@ -17,6 +17,9 @@ venv:			## Create a virtual environment
 	@echo
 	@echo "Run 'source .venv/bin/activate' to enable the environment"
 
+activate:
+	@source .venv/bin/activate
+
 .PHONY: install
 install:		## Install dependencies
 	pip install -r requirements-dev.txt
@@ -30,13 +33,13 @@ stress-test:
 	mkdir reports || true
 	locust -f tests/stress/api-stress.py --print-stats --html reports/stress-test.html --run-time 60s --headless --users 100 --spawn-rate 1 -H $(STRESS_URL)
 
-.PHONY: model-test
-test:			## Run tests and coverage
+.PHONY: activate model-test
+model-test:			## Run tests and coverage
 	mkdir reports || true
 	pytest --cov-config=.coveragerc --cov-report term --cov-report html:reports/html --cov-report xml:reports/coverage.xml --junitxml=reports/junit.xml --cov=challenge tests/model
 
 .PHONY: api-test
-test:			## Run tests and coverage
+api-test:			## Run tests and coverage
 	mkdir reports || true
 	pytest --cov-config=.coveragerc --cov-report term --cov-report html:reports/html --cov-report xml:reports/coverage.xml --junitxml=reports/junit.xml --cov=challenge tests/integration
 

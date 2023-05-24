@@ -10,7 +10,7 @@ class TestModel(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.model = DelayModel()
-        self.data = pd.read_csv(filepath_or_buffer="../data/data.csv")
+        self.data = self.model.data
         
     def test_model_preprocess_for_training(
         self
@@ -21,22 +21,24 @@ class TestModel(unittest.TestCase):
         )
 
         assert isinstance(features, pd.DataFrame)
-        assert features.columns == [
-            "OPERA_Latin American Wings", 
-            "MES_7",
-            "MES_10",
-            "OPERA_Grupo LATAM",
-            "MES_12",
-            "TIPOVUELO_I",
-            "MES_4",
-            "MES_11",
-            "OPERA_Sky Airline",
-            "OPERA_Copa Air"
-        ]
+        self.assertCountEqual(features.columns.tolist(), 
+                              [
+                                "OPERA_Latin American Wings", 
+                                "MES_7",
+                                "MES_10",
+                                "OPERA_Grupo LATAM",
+                                "MES_12",
+                                "TIPOVUELO_I",
+                                "MES_4",
+                                "MES_11",
+                                "OPERA_Sky Airline",
+                                "OPERA_Copa Air"
+                            ])
         assert isinstance(target, pd.DataFrame)
-        assert target.columns == [
-            "delay"
-        ]
+        self.assertCountEqual(
+                                target.columns.tolist(), 
+                                ["delay"]
+                            )
 
     def test_model_preprocess_for_serving(
         self
@@ -46,18 +48,20 @@ class TestModel(unittest.TestCase):
         )
 
         assert isinstance(features, pd.DataFrame)
-        assert features.columns == [
-            "OPERA_Latin American Wings", 
-            "MES_7",
-            "MES_10",
-            "OPERA_Grupo LATAM",
-            "MES_12",
-            "TIPOVUELO_I",
-            "MES_4",
-            "MES_11",
-            "OPERA_Sky Airline",
-            "OPERA_Copa Air"
-        ]
+        self.assertCountEqual(features.columns.tolist(), 
+                              [
+                                "OPERA_Latin American Wings", 
+                                "MES_7",
+                                "MES_10",
+                                "OPERA_Grupo LATAM",
+                                "MES_12",
+                                "TIPOVUELO_I",
+                                "MES_4",
+                                "MES_11",
+                                "OPERA_Sky Airline",
+                                "OPERA_Copa Air"
+                            ])
+
 
     def test_model_fit(
         self
@@ -67,11 +71,11 @@ class TestModel(unittest.TestCase):
             target_column="delay"
         )
 
-        _, features_validation, _, target_validation = train_test_split(features, target, test_size = 0.33, random_state = 42)
+        features_train, features_validation, target_train, target_validation = train_test_split(features, target, test_size = 0.33, random_state = 42)
 
         self.model.fit(
-            features=features,
-            target=target
+            features=features_train,
+            target=target_train
         )
 
         predicted_target = self.model._model.predict(

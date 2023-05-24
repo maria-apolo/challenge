@@ -3,11 +3,12 @@ from starlette.responses import JSONResponse
 from starlette.exceptions import HTTPException 
 import pandas as pd 
 
-from Flight import Flight
-from model import DelayModel
+from challenge.Flight import Flight
+from challenge.model import DelayModel
 
 app = FastAPI()
 delay_classifier = DelayModel()
+
 
 
 @app.get('/healthcheck', status_code=200)
@@ -26,6 +27,6 @@ def predict_delay(features: Flight):
         return HTTPException(status_code=400)
     pred = delay_classifier.predict(preprocessed_features)
     response_object = {
-        "predict": pred.tolist()
+        "predict": pred
     }
     return JSONResponse(response_object)
