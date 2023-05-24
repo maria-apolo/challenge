@@ -47,12 +47,12 @@ class DelayModel:
             "OPERA_Copa Air"
         ]
 
-        data = add_derivated_features(data)
+
         encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
         nominal_encode = encoder.fit_transform(data[['OPERA','TIPOVUELO', 'MES']])
         if(target_column):
 
-
+            data = add_derivated_features(data)
             #Converting back to a dataframe
             features_nominal = pd.DataFrame(nominal_encode, columns=encoder.get_feature_names_out())
             target = data[target_column].to_frame(name='delay')

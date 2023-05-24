@@ -9,8 +9,6 @@ from challenge.model import DelayModel
 app = FastAPI()
 delay_classifier = DelayModel()
 
-
-
 @app.get('/healthcheck', status_code=200)
 async def healthcheck():
     return 'Predict Delay is running!'
@@ -21,10 +19,7 @@ def predict_delay(features: Flight):
     columns = ['OPERA', 'TIPOVUELO', 'MES']
     df = pd.DataFrame(columns=columns)
     df.loc[0] = data
-    try:
-        preprocessed_features = delay_classifier.preprocess(df)
-    except:
-        return HTTPException(status_code=400)
+    preprocessed_features = delay_classifier.preprocess(df)
     pred = delay_classifier.predict(preprocessed_features)
     response_object = {
         "predict": pred
