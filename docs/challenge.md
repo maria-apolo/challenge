@@ -5,52 +5,52 @@
 ## Implementation
 
 ### Part I
-#### Fixes
+### Fixes
 
 Before operationalized the model, It was necessary to execute some fixes. The following table shows a summary of the main fixes. 
 
 
 | File |Fixes |
 | --- | --- | 
-| `utils.py` | * get_period_day had extra intervals - * get_rate_from_column antipattern iterrows fix - * Delay rate formula correction rate = delay<class> / total<class> | 
-| `model.py` | * Union parenthesis correction |
-| `Makefile` | * Test was repeated and therefore, overwritten. - * Stress_test path folder correction| 
-| `test_model.py` | * Test_model_fit was computing .fit function over the whole dataset, then computing predict over already seen data| 
+| `utils.py` | - `get_period_day` had extra intervals - `get_rate_from_column` antipattern iterrows fix - Delay rate formula correction rate = (delay:class: / total:class:)*100 | 
+| `model.py` | * - Union parenthesis correction |
+| `Makefile` | * - Test was repeated and therefore, overwritten. - Stress_test path folder correction| 
+| `test_model.py` | * - `Test_model_fit` was computing .fit function over the whole dataset, then computing predict over already seen data| 
 | `requirements.txt` | * XGBoost added | 
 
-#### Variables
+### Variables
 
 The following table shows the candidate training attributes, its preprocessing options and extra details.
 
 | Attribute | Type | Preprocessing | Extra |
 | --- | --- | --- | --- |
 | `DIA/MES` | Categorical Ordinal / Cyclic variables | Onehot encoding / SinCos representation| MES was finally choosen due to notable influence based on plots information|
-| `DIANOM` | Categorical Ordinal / Cyclic variable | Categorical Ordinal / Cyclic variable | This variable didn't show impact in performance |
-| `AÑO` | Numerical variable | Normalization | This variable didn't show significative impact in performance |
+| `DIANOM` | Categorical Ordinal / Cyclic variable | Onehot encoding / SinCos representation | This variable didn't show impact in performance (recall_test) |
+| `AÑO` | Numerical variable | Normalization | This variable didn't show significative impact in  performance (recall_test) |
 | `TIPO_VUELO` | Categorical Nominal | Onehot Encoding| Selected attribute based on notable importance show in plots|
 | `OPERA` | Categorical Nominal | Onehot Encoding| Selected attribute based on notable importance show in plots information|
-| `SIGLADES` | Categorical Nominal HIGH DIMENSIONALITY | Select top k values based on distribution, replace the remaining ones with 'Other' | Including this variable showed notable decreased in performance even after preprocessing|
+| `SIGLADES` | Categorical Nominal HIGH DIMENSIONALITY | Select top k values based on distribution, replace the remaining ones with 'Other' | Including this variable showed notable decreased in  performance (recall_test) even after preprocessing|
 | `SIGLAORI`| Categorical Nominal | One hot encoding | All flights took off from 'Santiago' |
-| `high_season`| Categorical Binary | Numeric | This variable didn't show significative impact in performance |
-| `period_day`| Categorical Ordinal / Cyclic variable | Categorical Ordinal / Cyclic variable | This variable didn't show impact in performance |
+| `high_season`| Categorical Binary | Numeric | This variable didn't show significative impact in  performance (recall_test) |
+| `period_day`| Categorical Ordinal / Cyclic variable | Onehot encoding / SinCos representation | This variable didn't show impact in  performance (recall_test) |
 
 
-#### Hyperparameters tuning
+### Hyperparameters tuning
 
 * XGBoost: 
-  - max_depth: maximum depth of a tree. values = [3,4,5,6,7]
-  - min child weight: minimum sum of weights of all observations required in the child [1,2,3]
+  - `max_depth`: maximum depth of a tree. values = [3,4,5,6,7]
+  - `min_child_weight`: minimum sum of weights of all observations required in the child [1,2,3]
 
   Best parameters: max_depth: 5, min_child_weight: 1, recall: 0.72
 
 * Logistic Regression 
-  - solver. values = ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
-  - penalty: regularization. ['none', 'l1', 'l2', 'elasticnet']
-  - C [100,10,1,0.1,0.01]
+  - `solver`. values = ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
+  - `penalty`: regularization. ['none', 'l1', 'l2', 'elasticnet']
+  - `C` [100,10,1,0.1,0.01]
 
   Best parameters: Hyperparameter tuning didn't show further improvement.
 
-#### Model Comparison
+### Model Comparison
 
 *XGBoost: ML Opensource library which contains and optimal implementation of Gradient Boosting Algorithm Based on Trees. 
 *Logistic Regression: Curvy linearly approach that analized the dependencies between a set of variables. 
@@ -71,15 +71,16 @@ Reasoning:
 
 * Finally, XGBoost also offers explicability in order to understand the rules which commandate its decision making and make it more easily understandable. 
 
-#### Good programming practices
+### Good programming practices
 
 There is significant place for improvement in my approach. One practical example, add a configuration file for paths or dictionaries. Feedback in this topic would be appreciated!
 
-#### Test Model
+### Test Model
 
 In order to execute test-model, the following commands have to be executed:
 
-```make venv
+```
+make venv
 source .venv/bin/activate
 make install
 make test-model
@@ -88,18 +89,20 @@ The result shows 4/4 test completion [with warning!].
 
 ## Part II
 
-#### Run server
+### Run server
 
 To run the test, you need to compile and execute the Dockerfile to deploy the API locally, and then perform the tests towards the API. The commands to execute the Dockerfile are as follows:
 
-```docker build -t gcr.io/prueba-latam-challenge/myapp .
+```
+docker build -t gcr.io/prueba-latam-challenge/myapp .
 docker run -dp 1243:1243 -e PORT=1243 gcr.io/prueba-latam-challenge/myapp
 ```
 
 ### Execute test
 Once the API is running on localhost:1243, it's time to start the testing:
 
-```source .venv/bin/activate
+```
+source .venv/bin/activate
 make api-test
 ```
 
@@ -113,7 +116,7 @@ Considerations:
 
 ## Part III
 
-#### Deployment
+### Deployment
 
 Finally, the service was deployed on Google Cloud. It is actually running on: 
 
