@@ -37,13 +37,13 @@ The following table shows the candidate training attributes, its preprocessing o
 
 #### Hyperparameters tuning
 
-*XGBoost: 
+* XGBoost: 
   - max_depth: maximum depth of a tree. values = [3,4,5,6,7]
   - min child weight: minimum sum of weights of all observations required in the child [1,2,3]
 
   Best parameters: max_depth: 5, min_child_weight: 1, recall: 0.72
 
-*Logistic Regression 
+* Logistic Regression 
   - solver. values = ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga']
   - penalty: regularization. ['none', 'l1', 'l2', 'elasticnet']
   - C [100,10,1,0.1,0.01]
@@ -63,12 +63,11 @@ Reasoning:
 
 * Additionally, given the high dimensionality of the classes present in the input variables, we are faced with a high-dimensional dataset where it is necessary to employ strategies such as prioritizing the most important variables. Given this complexity, it is my belief that XGBoost has greater potential to tackle this problem, given its robustness in handling the overfitting that can occur in high-dimensional datasets with a limited number of rows.
 
-*Furthermore, it is of utmost importance to consider that this is a clear case of class imbalance with a 4:1 ratio, for which it has been shown that tree-based models are more robust to this type of problem.
+* Furthermore, it is of utmost importance to consider that this is a clear case of class imbalance with a 4:1 ratio, for which it has been shown that tree-based models are more robust to this type of problem.
 
 * Despite the results obtained for both models in their default versions, XGBoost is notably superior to Logistic Regression in terms of the potential it can achieve through hyperparameters tuning. This is demonstrated both in the number of adjustable parameters that XGBoost has compared to the limited number of Logistic Regression, as well as in the competitive benchmark results obtained with this model. This gives XGBoost greater potential for future improvements in this implementation.
 
 * On the other hand, the computational efficiency of XGBoost makes it a relevant candidate when it comes to deploying a cloud service, where latency and stress tests are important parameters to evaluate.
-
 
 * Finally, XGBoost also offers explicability in order to understand the rules which commandate its decision making and make it more easily understandable. 
 
@@ -77,6 +76,7 @@ Reasoning:
 There is significant place for improvement in my approach. One practical example, add a configuration file for paths or dictionaries. Feedback in this topic would be appreciated!
 
 #### Test Model
+
 In order to execute test-model, the following commands have to be executed:
 
 ```make venv
@@ -84,7 +84,6 @@ source .venv/bin/activate
 make install
 make test-model
 ```
-
 The result shows 4/4 test completion [with warning!].
 
 ## Part II
@@ -110,10 +109,9 @@ Considerations:
 
 * json format was modified in order to enhance a more simple and easy structure.
 * The error code 400 has been replaced with the error code 422 because this error provides more information. Additionally, considering the validation performed with typing, it is capable of identifying the erroneous parameter and providing valid values.
-###
 
 
-## Part II
+## Part III
 
 #### Deployment
 
