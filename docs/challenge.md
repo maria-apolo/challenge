@@ -43,7 +43,7 @@ Put your url in the `Makefile` (`line 26`). Then we will test the perfomance wit
 
 ## Implementation
 
-### Part 1 
+### Part I
 #### Fixes
 
 Before operationalized the model, It was necessary to implement fixes in the following files:
