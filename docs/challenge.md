@@ -13,9 +13,9 @@ Before operationalized the model, It was necessary to execute some fixes. The fo
 | File |Fixes |
 | --- | --- | 
 | `utils.py` | - `get_period_day` had extra intervals - `get_rate_from_column` antipattern iterrows fix - Delay rate formula correction rate = (delay:class: / total:class:)*100 | 
-| `model.py` | * - Union parenthesis correction |
-| `Makefile` | * - Test was repeated and therefore, overwritten. - Stress_test path folder correction| 
-| `test_model.py` | * - `Test_model_fit` was computing .fit function over the whole dataset, then computing predict over already seen data| 
+| `model.py` | - Union parenthesis correction |
+| `Makefile` | - Test was repeated and therefore, overwritten. - Stress_test path folder correction| 
+| `test_model.py` | - `Test_model_fit` was computing .fit function over the whole dataset, then computing predict over already seen data| 
 | `requirements.txt` | * XGBoost added | 
 
 ### Variables
@@ -52,10 +52,10 @@ The following table shows the candidate training attributes, its preprocessing o
 
 ### Model Comparison
 
-*XGBoost: ML Opensource library which contains and optimal implementation of Gradient Boosting Algorithm Based on Trees. 
-*Logistic Regression: Curvy linearly approach that analized the dependencies between a set of variables. 
+* XGBoost: ML Opensource library which contains and optimal implementation of Gradient Boosting Algorithm Based on Trees. 
+* Logistic Regression: Curvy linearly approach that analized the dependencies between a set of variables. 
 
-Option: XGBoost
+Option: `XGBoost`
 
 Reasoning: 
  
