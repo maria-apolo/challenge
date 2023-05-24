@@ -1,17 +1,5 @@
-*Instructions: Click on the raw button in the upper right hand corner of this box.  Copy and paste the template into the README.md document on your github.  Fill in the titles, information and links where prompted! Feel free to stray a bit to suit your project but try to stick to the format as closely as possible for consistency across DSWG projects.*
 
 # LATAM challenge - María José Apolo
-
-
-### Part III.
-
-Deploy your `API` to you favorite cloud provider (we recomend to use GCP, you will need to put a credit card but no charge will be issue [[info]](https://cloud.google.com/free/docs/free-cloud-features#billing_verification)) where we going to run a series of test and run performance benchmark.
-
-We are looking for seeing a proper `CI/CD` implementation for this development. We recommend using GitHub Actions but this is not a constraint, feel free to use whatever you wish (we will check the implementation).
-
-Put your url in the `Makefile` (`line 26`). Then we will test the perfomance with the comand `make stress-test`. Make sure to go in `tests/stress/api-stress.py` and add the necesary inputs so the test run in the endpoint.
-
-**It is important that the API is deployed until we review the tests. If your API needs any authentication method, you must indicate which one and ensure that we can access it.**
 
 
 ## Implementation
@@ -35,7 +23,7 @@ Before operationalized the model, It was necessary to execute some fixes. The fo
 The following table shows the candidate training attributes, its preprocessing options and extra details.
 
 | Attribute | Type | Preprocessing | Extra |
-| --- | --- | --- | |
+| --- | --- | --- | --- |
 | `DIA/MES` | Categorical Ordinal / Cyclic variables | Onehot encoding / SinCos representation| MES was finally choosen due to notable influence based on plots information|
 | `DIANOM` | Categorical Ordinal / Cyclic variable | Categorical Ordinal / Cyclic variable | This variable didn't show impact in performance |
 | `AÑO` | Numerical variable | Normalization | This variable didn't show significative impact in performance |
